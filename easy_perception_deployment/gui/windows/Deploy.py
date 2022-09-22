@@ -243,7 +243,7 @@ class DeployWindow(QWidget):
             self._DEPLOY_WIN_H * 2/4,
             self._DEPLOY_WIN_W * 3/8,
             self._DEPLOY_WIN_H/8)
-        self.register_topic_button.setText('Register Topic')
+        self.register_topic_button.setText('Set camera and object')
 
         self.topic_button = QTextEdit(self)
         self.topic_button.setGeometry(
@@ -320,7 +320,7 @@ class DeployWindow(QWidget):
         '''
         new_image_topic = self.topic_button.toPlainText()
         self.deploy_logger.info(
-            'Rewriting Input Image Topic to: ' +
+            'Rewriting Topic Settings to: ' +
             new_image_topic)
 
         dict = {"input_image_topic": new_image_topic}

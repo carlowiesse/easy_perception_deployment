@@ -19,7 +19,7 @@ import json
 import os
 
 def generate_launch_description():
- 
+
     pkg_share = FindPackageShare(package='easy_perception_deployment').find('easy_perception_deployment')
 
     filepath_to_input_image_json = os.path.join(pkg_share, 'config/input_image_topic.json')
@@ -28,13 +28,26 @@ def generate_launch_description():
 
     data = json.load(input_image_json)
 
-    input_image_topic = data['input_image_topic']
+    topic_settings = data['input_image_topic'].split(',')
+    camera_name = topic_settings[0].strip()
+    object_name = topic_settings[1].strip()
+    print('camera name: ',camera_name)
+    print('object name: ',object_name)
 
     return LaunchDescription([
         launch_ros.actions.Node(
             package='easy_perception_deployment',
             executable='easy_perception_deployment',
             output='screen',
-            remappings=[('/easy_perception_deployment/image_input', input_image_topic)]
+            remappings=[('/easy_perception_deployment/image_input', '/'+camera_name+'/color/image_raw'),
+                        ('/camera/color/image_raw', '/'+camera_name+'/color/image_raw'),
+                        ('/camera/depth/image_rect_raw', '/'+camera_name+'/aligned_depth_to_color/image_raw'),
+                        ('/camera/color/camera_info', '/'+camera_name+'/color/camera_info'),
+                        ('/easy_perception_deployment/image_output', '/easy_perception_deployment/image_output_'+object_name),
+                        ('/easy_perception_deployment/epd_p1_output', '/easy_perception_deployment/epd_p1_output_'+object_name),
+                        ('/easy_perception_deployment/epd_p2_output', '/easy_perception_deployment/epd_p2_output_'+object_name),
+                        ('/easy_perception_deployment/epd_p3_output', '/easy_perception_deployment/epd_p3_output_'+object_name),
+                        ('/easy_perception_deployment/epd_tracking_output', '/easy_perception_deployment/epd_tracking_output_'+object_name),
+                        ('/easy_perception_deployment/epd_localize_output', '/easy_perception_deployment/epd_localize_output_'+object_name)]
             ),
     ])
