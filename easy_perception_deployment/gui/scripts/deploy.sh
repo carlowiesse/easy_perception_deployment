@@ -74,7 +74,7 @@ else
       echo "epd-foxy-base:GPU  Docker Image [ CREATED ]"
   fi
 fi
-
+<<com
 # Call ROS2 image_tool showimage.
 if [ "$showImage" = True ] ; then
   # Source local ROS2 distro
@@ -89,7 +89,7 @@ if [ "$showImage" = True ] ; then
 
   ros2 run image_tools showimage --ros-args --remap /image:=/easy_perception_deployment/output > /dev/null 2>&1 &
 fi
-
+com
 START_DIR=$(pwd)
 cd ../../
 
@@ -102,18 +102,28 @@ elif [[ $input == "n" ]]; then
 fi
 
 if [ "$useCPU" = True ] ; then
-  sudo docker run -it --rm \
-  --name epd_test_container \
-  -v $(pwd):/root/epd_ros2_ws/src/easy_perception_deployment \
-  cardboardcode/epd-foxy-base:CPU \
-  $launch_script
+  if docker ps | grep epd_test_container; then
+    sudo docker exec -it epd_test_container $launch_script
+  else
+    #sudo docker run -it --rm \
+    sudo docker run -it --net=host --rm \
+    --name epd_test_container \
+    -v $(pwd):/root/epd_ros2_ws/src/easy_perception_deployment \
+    cardboardcode/epd-foxy-base:CPU \
+    $launch_script
+  fi
 else
-  sudo docker run -it --rm \
-  --name epd_test_container \
-  -v $(pwd):/root/epd_ros2_ws/src/easy_perception_deployment \
-  --gpus all \
-  cardboardcode/epd-foxy-base:GPU \
-  $launch_script
+  if docker ps | grep epd_test_container; then
+    sudo docker exec -it epd_test_container $launch_script
+  else
+    #sudo docker run -it --rm \
+    sudo docker run -it --net=host --rm \
+    --name epd_test_container \
+    -v $(pwd):/root/epd_ros2_ws/src/easy_perception_deployment \
+    --gpus=all \
+    roscon/epd-foxy-cyclonedds:GPU \
+    $launch_script
+  fi
 fi
 
 unset input
