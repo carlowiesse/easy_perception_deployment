@@ -1,0 +1,6 @@
+{
+    "path_to_model": "./data/model/box-trained.onnx",
+    "path_to_label_list": "./data/label_list/box_classes.txt",
+    "visualizeFlag": "robot",
+    "useCPU": "GPU"
+}

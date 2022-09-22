@@ -1,0 +1,6 @@
+{
+    "path_to_model": "./data/model/tray-trained.onnx",
+    "path_to_label_list": "./data/label_list/tray_classes.txt",
+    "visualizeFlag": "robot",
+    "useCPU": "GPU"
+}

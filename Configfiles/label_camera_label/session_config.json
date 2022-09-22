@@ -1,0 +1,6 @@
+{
+    "path_to_model": "./data/model/label-trained.onnx",
+    "path_to_label_list": "./data/label_list/label_classes.txt",
+    "visualizeFlag": "robot",
+    "useCPU": "GPU"
+}
