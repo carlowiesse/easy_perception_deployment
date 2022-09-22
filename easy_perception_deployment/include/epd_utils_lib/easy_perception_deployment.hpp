@@ -390,13 +390,24 @@ void EasyPerceptionDeployment::process_localize_callback(
     RCLCPP_INFO(this->get_logger(), "[-FPS-]= %f\n", 1000.0 / elapsedTime.count());
 
   } else {
+    EPD::EPDObjectTracking converted_result(result.data_size);
+    converted_result.object_ids.clear();
+    for (size_t i = 0; i < result.data_size; i++) {
+      converted_result.objects.emplace_back(result.objects[i]);
+    }
+    cv::Mat resultImg = ortAgent_.visualize(converted_result, img);
+    sensor_msgs::msg::Image::SharedPtr debug_msg =
+      cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", resultImg).toImageMsg();
+
+
     epd_msgs::msg::EPDObjectLocalization output_msg;
 
     output_msg.header = std_msgs::msg::Header();
     output_msg.header.frame_id = "camera_color_optical_frame";
     output_msg.frame_width = img.cols;
     output_msg.frame_height = img.rows;
-    output_msg.depth_image = *depth_msg;
+    //output_msg.depth_image = *depth_msg;
+    output_msg.depth_image = *debug_msg;
 
     // Populate ppx, ppy, fx and fy intrinsic camera parameters
     output_msg.ppx = camera_info->k.at(2);
@@ -409,21 +420,21 @@ void EasyPerceptionDeployment::process_localize_callback(
       epd_msgs::msg::LocalizedObject object;
       object.name = result.objects[i].name;
       object.roi = result.objects[i].roi;
-      sensor_msgs::msg::Image::SharedPtr mask_ptr = cv_bridge::CvImage(
-        std_msgs::msg::Header(),
-        "mono16",
-        result.objects[i].mask).toImageMsg();
-      object.segmented_binary_mask = *mask_ptr;
-      object.segmented_binary_mask.header.frame_id = "camera_color_optical_frame";
+      //sensor_msgs::msg::Image::SharedPtr mask_ptr = cv_bridge::CvImage(
+      //  std_msgs::msg::Header(),
+      //  "mono16",
+      //  result.objects[i].mask).toImageMsg();
+      //object.segmented_binary_mask = *mask_ptr;
+      //object.segmented_binary_mask.header.frame_id = "camera_color_optical_frame";
       object.centroid = result.objects[i].centroid;
       object.length = result.objects[i].length;
       object.breadth = result.objects[i].breadth;
       object.height = result.objects[i].height;
       object.axis = result.objects[i].axis;
 
-      sensor_msgs::msg::PointCloud2 output_segmented_pcl;
-      pcl::toROSMsg(result.objects[i].segmented_pcl, output_segmented_pcl);
-      object.segmented_pcl = output_segmented_pcl;
+      //sensor_msgs::msg::PointCloud2 output_segmented_pcl;
+      //pcl::toROSMsg(result.objects[i].segmented_pcl, output_segmented_pcl);
+      //object.segmented_pcl = output_segmented_pcl;
 
       output_msg.objects.push_back(object);
     }
