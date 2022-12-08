@@ -206,7 +206,7 @@ void OrtBase::OrtBaseImpl::initModelInfo()
 
     // DEBUG
     // Identified potential failure point for loading point.
-    char * inputName = m_session.GetInputName(i, m_ortAllocator);
+    char * inputName = m_session.GetInputNameAllocated(i, m_ortAllocator).get();
     m_inputNodeNames.emplace_back(strdup(inputName));
     m_ortAllocator.Free(inputName);
   }
@@ -230,7 +230,7 @@ void OrtBase::OrtBaseImpl::initModelInfo()
 
     m_outputShapes.emplace_back(tensorInfo.GetShape());
 
-    char * outputName = m_session.GetOutputName(i, m_ortAllocator);
+    char * outputName = m_session.GetOutputNameAllocated(i, m_ortAllocator).get();
     m_outputNodeNames.emplace_back(strdup(outputName));
     m_ortAllocator.Free(outputName);
   }
